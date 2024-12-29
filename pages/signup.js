@@ -1,4 +1,7 @@
 // pages/signup.js
+import { useState } from 'react'
+import { useRouter } from 'next/router'
+
 export default function SignUp() {
     const [formData, setFormData] = useState({
       shopName: '',
