@@ -8,6 +8,151 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  businesses Business[] // For business owners
+  bookings   Booking[] // For customers
+  favorites  Favorite[]
+}
+
+enum Role {
+  CUSTOMER
+  BUSINESS
+  ADMIN
+}
+
+model Business {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  email       String
+  phone       String?
+  website     String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  owner     User       @relation(fields: [ownerId], references: [id])
+  locations Location[]
+  employees Employee[]
+  services  Service[]
+  bookings  Booking[]
+}
+
+model Location {
+  id         String   @id @default(cuid())
+  name       String
+  address    String
+  city       String
+  state      String
+  zipCode    String
+  phone      String?
+  email      String?
+  businessId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  business  Business   @relation(fields: [businessId], references: [id])
+  employees Employee[]
+  services  Service[]
+  bookings  Booking[]
+}
+
+model Employee {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  businessId String
+  locationId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  active     Boolean  @default(true)
+
+  // Relations
+  business  Business   @relation(fields: [businessId], references: [id])
+  location  Location   @relation(fields: [locationId], references: [id])
+  services  Service[]
+  bookings  Booking[]
+  favorites Favorite[]
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  duration    Int // in minutes
+  price       Float
+  businessId  String
+  locationId  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  business  Business   @relation(fields: [businessId], references: [id])
+  location  Location?  @relation(fields: [locationId], references: [id])
+  employees Employee[]
+  bookings  Booking[]
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  date          DateTime
+  status        BookingStatus @default(PENDING)
+  businessId    String
+  locationId    String
+  serviceId     String
+  employeeId    String
+  userId        String? // Optional for non-registered customers
+  customerName  String
+  customerEmail String
+  customerPhone String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  business Business @relation(fields: [businessId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+  service  Service  @relation(fields: [serviceId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  user     User?    @relation(fields: [userId], references: [id])
+  Shop     Shop?    @relation(fields: [shopId], references: [id])
+  shopId   String?
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  employeeId String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+
+  @@unique([userId, employeeId])
+}
+
+// Keep the existing Shop model for backward compatibility during migration
 model Shop {
   id        String    @id @default(cuid())
   name      String
@@ -16,18 +161,5 @@ model Shop {
   password  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Booking   Booking[]
-}
-
-model Booking {
-  id            String   @id @default(cuid())
-  shopId        String
-  shop          Shop     @relation(fields: [shopId], references: [id])
-  customerName  String
-  customerEmail String
-  date          DateTime
-  service       String
-  status        String   @default("pending")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  Booking   Booking[] // Will be deprecated
 }

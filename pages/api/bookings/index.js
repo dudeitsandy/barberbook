@@ -1,15 +1,10 @@
-// pages/api/bookings.js
+// pages/api/bookings/index.js
 import { PrismaClient } from '@prisma/client'
+import { withAuth } from '../auth/middleware'
 
 const prisma = new PrismaClient()
 
-const SERVICES = {
-  'haircut': { price: 30, name: 'Haircut' },
-  'haircut-and-beard': { price: 45, name: 'Haircut & Beard' },
-  'beard-trim': { price: 20, name: 'Beard Trim' }
-}
-
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' })
   }
@@ -17,7 +12,6 @@ export default async function handler(req, res) {
   try {
     const { service, date, time, name, email, shopId } = req.body
 
-    // Create booking in database
     const booking = await prisma.booking.create({
       data: {
         shopId,
@@ -35,3 +29,6 @@ export default async function handler(req, res) {
     res.status(500).json({ message: 'Error creating booking' })
   }
 }
+
+// No business role required for bookings
+export default withAuth(handler, false)
