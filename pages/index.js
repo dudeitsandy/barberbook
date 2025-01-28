@@ -28,7 +28,7 @@ export default function Landing() {
                 {/* Business Section */}
                 <div className="flex items-center space-x-2">
                   <Link 
-                    href="/auth/register-business"
+                    href="/auth/business/register"
                   >
                     <a className="text-gray-700 hover:text-gray-900">Register Business</a>
                   </Link>
