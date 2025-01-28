@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "4.16.2",
@@ -14,7 +18,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
-    "next": "13.3.0",
+    "next": "^15.1.6",
     "next-auth": "^4.24.11",
     "pg": "^8.13.1",
     "react": "18.2.0",
@@ -22,9 +26,13 @@
     "stripe": "^12.0.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.12.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "prisma": "4.16.2",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }

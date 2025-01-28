@@ -10,19 +10,40 @@ export default function Landing() {
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
+            {/* <div className="flex items-center">
+              <Image
+                src="/images/logo-black.jpg"
+                alt="BarberBook Logo"
+                width={40}
+                height={40}
+                priority
+              />
+              <span className="ml-2 text-xl font-bold">BarberBook</span> }*/
+            </div>
             <div className="flex items-center space-x-4">
-              <Link 
-                href="/auth/login"
-                className="text-gray-700 hover:text-gray-900"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/admin"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                Business Dashboard
-              </Link>
+              <div className="flex space-x-4">
+                {/* Customer Section */}
+                <div className="flex items-center space-x-2">
+                  <Link 
+                    href="/auth/login"
+                  >
+                    <a className="text-gray-700 hover:text-gray-900">Login</a>
+                  </Link>
+                  <Link 
+                    href="/auth/register"
+                  >
+                    <a className="text-gray-700 hover:text-gray-900">Register</a>
+                  </Link>
+                </div>
+                {/* Business Section */}
+                <div className="flex items-center space-x-2">
+                  <Link 
+                    href="/auth/register-business"
+                  >
+                    <a className="text-gray-700 hover:text-gray-900">Register Business</a>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
