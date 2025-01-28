@@ -3,15 +3,19 @@ frontend:
   phases:
     preBuild:
       commands:
-        - DB_USER=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_USER" --with-decryption --query "Parameter.Value" --output text)
-        - DB_PASSWORD=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text)
-        - DB_HOST=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_HOST" --with-decryption --query "Parameter.Value" --output text)
-        - DB_PORT=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_PORT" --with-decryption --query "Parameter.Value" --output text)
-        - DB_NAME=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_NAME" --with-decryption --query "Parameter.Value" --output text)
-        - export DATABASE_URL="postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"
+        # Fetch SSM parameters and export them as environment variables
+        - DB_USER=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_USER" --with-decryption --query "Parameter.Value" --output text) &&
+          DB_PASSWORD=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text) &&
+          DB_HOST=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_HOST" --with-decryption --query "Parameter.Value" --output text) &&
+          DB_PORT=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_PORT" --with-decryption --query "Parameter.Value" --output text) &&
+          DB_NAME=$(aws ssm get-parameter --name "/amplify/d1wqtpmdybsida/master/DB_NAME" --with-decryption --query "Parameter.Value" --output text) &&
+          export DATABASE_URL="postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"
+
+        # Install dependencies
         - npm ci
     build:
       commands:
+        # Build the application
         - npm run build
   artifacts:
     baseDirectory: .next
