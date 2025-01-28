@@ -4,19 +4,18 @@ frontend:
     preBuild:
       commands:
         - echo "DB_USER: $DB_USER"
-        - echo "DB_PASSWORD: $DB_PASSWORD"
-        - echo "Constructing DATABASE_URL"
-        - export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+        - echo "DB_HOST: $DB_HOST"
+        - echo "Constructing DATABASE_URL..."
+        - "export DATABASE_URL='postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}'"
         - echo "DATABASE_URL: $DATABASE_URL"
-        - npm ci
+        - "npm ci"
     build:
       commands:
-        - npm run build
-artifacts:
-  baseDirectory: .next
-  files:
-    - '**/*'
-    - public/**/*
-cache:
-  paths:
-    - node_modules/**/*
+        - "npm run build"
+  artifacts:
+    baseDirectory: .next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - "node_modules/**/*"
