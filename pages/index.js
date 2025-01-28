@@ -10,7 +10,7 @@ export default function Landing() {
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            {/* <div className="flex items-center">
+            <div className="flex items-center">
               <Image
                 src="/images/logo-black.jpg"
                 alt="BarberBook Logo"
@@ -18,7 +18,7 @@ export default function Landing() {
                 height={40}
                 priority
               />
-              <span className="ml-2 text-xl font-bold">BarberBook</span> }*/
+              <span className="ml-2 text-xl font-bold">BarberBook</span>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex space-x-4">
