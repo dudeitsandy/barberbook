@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 async function main() {
   // Clear existing data
-  await prisma.favorite.deleteMany()
+  // await prisma.favorite.deleteMany()
   await prisma.booking.deleteMany()
   await prisma.service.deleteMany()
   await prisma.employee.deleteMany()
@@ -28,38 +28,27 @@ async function main() {
   })
 
   const businessOwner = await prisma.user.create({
-    
     data: {
-      name: 'Bob Barber',
-      email: 'business@example.com',
+      name: 'All Star SMB Owner',
+      email: 'owner@allstarsmb.com',
       password: businessPassword,
       role: 'BUSINESS',
       businessOwned: {
         create: {
-
-          name: "Bob's Barbershop",
+          name: "All Star SMB",
           phone: '(555) 123-4567',
           address: '123 Main St',
-          // Create locations for the business
+          // Create main location
           locations: {
             create: [
               {
-                name: 'Downtown Location',
+                name: 'All Star SMB Main',
                 address: '123 Main St',
                 city: 'New York',
                 state: 'NY',
                 zipCode: '10001',
                 phone: '(555) 123-4567',
-                email: 'downtown@bobsbarbershop.com'
-              },
-              {
-                name: 'Uptown Location',
-                address: '456 Park Ave',
-                city: 'New York',
-                state: 'NY',
-                zipCode: '10002',
-                phone: '(555) 987-6543',
-                email: 'uptown@bobsbarbershop.com'
+                email: 'info@allstarsmb.com'
               }
             ]
           }
@@ -68,12 +57,18 @@ async function main() {
     }
   })
 
-  // Get the business we just created
+  // Get the business and location we just created
   const business = await prisma.business.findFirst({
     where: { ownerId: businessOwner.id }
   })
 
   if (!business) throw new Error('Business not created')
+
+  const location = await prisma.location.findFirst({
+    where: { businessId: business.id }
+  })
+
+  if (!location) throw new Error('Location not created')
 
   // Get locations
   const locations = await prisma.location.findMany({
@@ -125,25 +120,23 @@ async function main() {
       }
     ]
   })
-  // Create employees
-  const employees = await Promise.all(
-    locations.map(async (location) => {
-      return prisma.employee.create({
-        data: {
-          name: `Employee at ${location.name}`,
-          email: `employee${location.id}@bobsbarbershop.com`,
-          phone: '(555) 000-0000',
-          businessId: business.id,
-          locationId: location.id,
-          active: true
-        }
-      })
-    })
-  )
 
-  // Create some sample bookings
+  // Create one employee
+  const employee = await prisma.employee.create({
+    data: {
+      name: `Employee at ${locations[0].name}`,
+      email: `employee@allstarsmb.com`,
+      phone: '(555) 000-0000',
+      businessId: business.id,
+      locationId: locations[0].id,
+      active: true
+    }
+  })
+
+  // Get all services
   const allServices = await prisma.service.findMany()
   
+  // Create one booking (remove the second booking that used locations[1])
   await prisma.booking.createMany({
     data: [
       {
@@ -152,33 +145,32 @@ async function main() {
         businessId: business.id,
         locationId: locations[0].id,
         serviceId: allServices[0].id,
-        employeeId: employees[0].id,
+        employeeId: employee.id,
         userId: customer.id,
         customerName: customer.name || 'John Customer',
         customerEmail: customer.email,
         customerPhone: '(555) 111-2222'
-      },
-      {
-        date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Day after tomorrow
-        status: 'PENDING',
-        businessId: business.id,
-        locationId: locations[1].id,
-        serviceId: allServices[1].id,
-        employeeId: employees[1].id,
-        customerName: 'Walk-in Customer',
-        customerEmail: 'walkin@example.com',
-        customerPhone: '(555) 333-4444'
       }
     ]
   })
 
-  // Create a favorite
-  await prisma.favorite.create({
+  // After creating services and employee, connect them
+  await prisma.employee.update({
+    where: { id: employee.id },
     data: {
-      userId: customer.id,
-      employeeId: employees[0].id
+      services: {
+        connect: allServices.map(service => ({ id: service.id }))
+      }
     }
   })
+
+  // // Create a favorite
+  // await prisma.favorite.create({
+  //   data: {
+  //     userId: customer.id,
+  //     employeeId: employees[0].id
+  //   }
+  // })
 
   console.log('Seed data created successfully')
 }

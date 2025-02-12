@@ -10,7 +10,7 @@ async function handler(req, res) {
   }
 
   try {
-    const { service, date, time, name, email, shopId } = req.body
+    const { serviceId, date, time, name, email, shopId } = req.body
 
     const booking = await prisma.booking.create({
       data: {
@@ -18,7 +18,7 @@ async function handler(req, res) {
         customerName: name,
         customerEmail: email,
         date: new Date(`${date}T${time}`),
-        service: SERVICES[service].name,
+        serviceId: serviceId,
         status: 'confirmed'
       }
     })
