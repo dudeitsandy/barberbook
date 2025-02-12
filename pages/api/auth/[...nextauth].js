@@ -14,28 +14,40 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password required')
-        }
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error('Email and password required')
+          }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        })
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+            include: {
+              businessOwned: true // Include business data
+            }
+          })
 
-        if (!user) {
-          throw new Error('No user found')
-        }
+          console.log('Found user:', user) // Add this log
 
-        const isValid = await bcrypt.compare(credentials.password, user.password)
+          if (!user) {
+            throw new Error('No user found')
+          }
 
-        if (!isValid) {
-          throw new Error('Invalid password')
-        }
+          const isValid = await bcrypt.compare(credentials.password, user.password)
+          console.log('Password valid:', isValid) // Add this log
 
-        return {
-          id: user.id,
-          email: user.email,
-          role: user.role,
+          if (!isValid) {
+            throw new Error('Invalid password')
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            businessId: user.businessOwned?.id
+          }
+        } catch (error) {
+          console.error('Auth error:', error) // Add detailed error logging
+          throw error
         }
       }
     })
@@ -53,11 +65,14 @@ export default NextAuth({
       return session
     }
   },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
   pages: {
     signIn: '/auth/login',
     error: '/auth/error',
   },
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   }
 })

@@ -11,12 +11,12 @@ export default function Layout({ children }) {
             <Link href="/" className="flex-shrink-0 flex items-center space-x-2">
               <Image
                 src="/images/logo-white.jpg"
-                alt="BarberBook Logo"
+                alt="TAG Logo"
                 width={40}
                 height={40}
                 priority
               />
-              <span className="text-xl font-bold">BarberBook</span>
+              <span className="text-xl font-bold text-[#0000FF]">TAG</span>
             </Link>
           </div>
         </div>
