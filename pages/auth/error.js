@@ -1,6 +1,8 @@
+import { useSearchParams } from 'next/navigation'
+
 export default function ErrorPage() {
-  const searchParams = new URLSearchParams(window.location.search)
-  const error = searchParams.get('error')
+  const searchParams = useSearchParams()
+  const error = searchParams?.get('error')
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -10,7 +12,7 @@ export default function ErrorPage() {
             Authentication Error
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Error: {error}
+            Error: {error || 'Unknown error occurred'}
           </p>
         </div>
       </div>
