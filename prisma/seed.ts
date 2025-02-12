@@ -28,6 +28,7 @@ async function main() {
   })
 
   const businessOwner = await prisma.user.create({
+    
     data: {
       name: 'Bob Barber',
       email: 'business@example.com',
@@ -35,6 +36,7 @@ async function main() {
       role: 'BUSINESS',
       businessOwned: {
         create: {
+
           name: "Bob's Barbershop",
           phone: '(555) 123-4567',
           address: '123 Main St',
@@ -82,32 +84,47 @@ async function main() {
   const services = await prisma.service.createMany({
     data: [
       {
-        name: 'Haircut',
-        description: 'Classic haircut with styling',
+        name: 'Kids & Seniors Cut',
+        description: 'Special rate for children and senior citizens',
         duration: 30,
         price: 30.00,
         businessId: business.id,
         locationId: locations[0].id
       },
       {
-        name: 'Beard Trim',
-        description: 'Professional beard trimming and shaping',
-        duration: 20,
-        price: 20.00,
+        name: 'SMP Hair Line or Crown',
+        description: 'Scalp micropigmentation service',
+        duration: 180, // 3h
+        price: 1500.00,
         businessId: business.id,
         locationId: locations[0].id
       },
       {
-        name: 'Haircut & Beard',
-        description: 'Full service haircut and beard trim',
-        duration: 45,
-        price: 45.00,
+        name: 'Adult and Teen Cuts',
+        description: 'Standard haircut service for adults and teens',
+        duration: 30,
+        price: 40.00,
+        businessId: business.id,
+        locationId: locations[0].id
+      },
+      {
+        name: 'Adult Cut Full Service',
+        description: 'Complete haircut service with additional styling',
+        duration: 40,
+        price: 50.00,
+        businessId: business.id,
+        locationId: locations[0].id
+      },
+      {
+        name: 'SMP Consultation',
+        description: 'Initial consultation for scalp micropigmentation',
+        duration: 30,
+        price: 100.00,
         businessId: business.id,
         locationId: locations[0].id
       }
     ]
   })
-
   // Create employees
   const employees = await Promise.all(
     locations.map(async (location) => {
