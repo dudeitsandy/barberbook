@@ -1,5 +1,6 @@
 import { QueueForm } from '@/components/QueueForm'
 import { useState } from 'react'
+import BookingForm from '@/components/BookingForm'
 
 export default function BookingPage() {
   const [bookingType, setBookingType] = useState<'appointment' | 'queue'>('appointment')
@@ -32,7 +33,7 @@ export default function BookingPage() {
       </div>
 
       {bookingType === 'appointment' ? (
-        <BookingForm /> // Your existing booking form
+        <BookingForm />
       ) : (
         <QueueForm locationId={shopId} />
       )}
