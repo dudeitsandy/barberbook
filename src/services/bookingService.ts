@@ -42,6 +42,7 @@ export class BookingService {
     customerName: string
     customerEmail: string
     customerPhone?: string
+    locationId?: string
   }) {
     const service = await prisma.service.findUnique({
       where: { id: data.serviceId }
@@ -64,6 +65,8 @@ export class BookingService {
       data: {
         serviceId: data.serviceId,
         employeeId: data.employeeId,
+        businessId: service.businessId,
+        locationId: service.locationId || data.locationId,
         date: parse(`${data.date} ${data.time}`, 'yyyy-MM-dd HH:mm', new Date()),
         userId: data.customerId,
         customerName: data.customerName,

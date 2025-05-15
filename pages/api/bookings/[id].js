@@ -1,6 +1,6 @@
 // pages/api/bookings/[id].js
 import { PrismaClient } from '@prisma/client'
-import { withAuth } from '../auth/middleware'
+import { withAuth } from '@/middleware/withAuth'
 
 const prisma = new PrismaClient()
 

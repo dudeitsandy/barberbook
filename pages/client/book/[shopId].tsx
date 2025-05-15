@@ -1,8 +1,11 @@
+import { useRouter } from 'next/router'
 import { QueueForm } from '@/components/QueueForm'
 import { useState } from 'react'
 import BookingForm from '@/components/BookingForm'
 
 export default function BookingPage() {
+  const router = useRouter()
+  const { shopId } = router.query
   const [bookingType, setBookingType] = useState<'appointment' | 'queue'>('appointment')
   
   return (

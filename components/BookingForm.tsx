@@ -20,7 +20,7 @@ const bookingSchema = z.object({
 type BookingFormData = z.infer<typeof bookingSchema>
 
 export default function BookingForm() {
-  const { createBooking } = useBooking()
+  const bookingMutation = useBooking()
   const [isSubmitting, setIsSubmitting] = useState(false)
   
   const { register, handleSubmit, formState: { errors } } = useForm<BookingFormData>({
@@ -30,7 +30,7 @@ export default function BookingForm() {
   const onSubmit = async (data: BookingFormData) => {
     setIsSubmitting(true)
     try {
-      await createBooking(data)
+      await bookingMutation.mutate(data)
       // Handle success
     } catch (err) {
       // Handle error
