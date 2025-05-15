@@ -1,11 +1,10 @@
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { AppError } from '@/utils/errors'
 
-const prisma = new PrismaClient()
-
-export default NextAuth({
+export const authConfig = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -16,27 +15,24 @@ export default NextAuth({
       async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) {
-            throw new Error('Email and password required')
+            throw AppError.BadRequest('Email and password required')
           }
 
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
             include: {
-              businessOwned: true // Include business data
+              businessOwned: true
             }
           })
 
-          console.log('Found user:', user) // Add this log
-
           if (!user) {
-            throw new Error('No user found')
+            throw AppError.NotFound('User not found')
           }
 
           const isValid = await bcrypt.compare(credentials.password, user.password)
-          console.log('Password valid:', isValid) // Add this log
 
           if (!isValid) {
-            throw new Error('Invalid password')
+            throw AppError.Unauthorized('Invalid password')
           }
 
           return {
@@ -46,12 +42,27 @@ export default NextAuth({
             businessId: user.businessOwned?.id
           }
         } catch (error) {
-          console.error('Auth error:', error) // Add detailed error logging
+          console.error('Auth error:', error)
           throw error
         }
       }
     })
   ],
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -66,15 +77,7 @@ export default NextAuth({
       session.user.businessId = token.businessId
       return session
     }
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development',
-  pages: {
-    signIn: '/auth/login',
-    error: '/auth/error',
-  },
-  session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   }
-})
+}
+
+export default NextAuth(authConfig) 

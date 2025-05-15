@@ -1,22 +1,13 @@
-// pages/api/bookings/index.js
-import { NextApiRequest, NextApiResponse } from 'next'
 import { withAuth } from '@/middleware/withAuth'
 import { BookingService } from '@/services/bookingService'
-import { QueueService } from '@/services/queueService'
 import { errorHandler } from '@/utils/errors'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (req.method) {
       case 'POST': {
-        const { type = 'appointment', ...data } = req.body
-
-        if (type === 'queue') {
-          const queueEntry = await QueueService.addToQueue(data)
-          return res.status(201).json(queueEntry)
-        }
-
-        const booking = await BookingService.createBooking(data)
+        const booking = await BookingService.createBooking(req.body)
         return res.status(201).json(booking)
       }
 
@@ -30,5 +21,4 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-// No business role required for bookings
-export default withAuth(handler, false)
+export default withAuth(handler) 

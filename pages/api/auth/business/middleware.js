@@ -1,7 +1,10 @@
 // pages/api/auth/business/middleware.js
 import { getToken } from 'next-auth/jwt'
+import { PrismaClient } from '@prisma/client'
 
-export async function withBusinessAuth(handler) {
+const prisma = new PrismaClient()
+
+export function withBusinessAuth(handler) {
   return async function(req, res) {
     try {
       const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
@@ -15,7 +18,6 @@ export async function withBusinessAuth(handler) {
       }
 
       // Add business user info to request
-      const prisma = new PrismaClient()
       const business = await prisma.business.findFirst({
         where: { ownerId: token.sub }
       })

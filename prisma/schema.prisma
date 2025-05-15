@@ -9,18 +9,19 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String?
-  email     String    @unique
+  email     String   @unique
   password  String
-  role      Role      @default(CUSTOMER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  role      Role     @default(CUSTOMER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations based on role
   businessOwned Business? // If role is BUSINESS
-  bookings     Booking[]  // If role is CUSTOMER
-  favorites    Favorite[]
+  bookings      Booking[] // If role is CUSTOMER
+  favorites     Favorite[]
+  Queue         Queue[]
 }
 
 enum Role {
@@ -30,20 +31,21 @@ enum Role {
 }
 
 model Business {
-  id          String    @id @default(cuid())
-  name        String
-  phone       String?
-  address     String?
-  ownerId     String    @unique
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  address   String?
+  ownerId   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  owner       User       @relation(fields: [ownerId], references: [id])
-  locations   Location[]
-  employees   Employee[]
-  services    Service[]
-  bookings    Booking[]
+  owner     User       @relation(fields: [ownerId], references: [id])
+  locations Location[]
+  employees Employee[]
+  services  Service[]
+  bookings  Booking[]
+  queue     Queue[]
 }
 
 model Location {
@@ -64,18 +66,19 @@ model Location {
   employees    Employee[]
   services     Service[]
   bookings     Booking[]
+  queue        Queue[]
 }
 
 model Employee {
-  id          String    @id @default(cuid())
-  name        String
-  email       String
-  phone       String?
-  businessId  String
-  locationId  String
-  active      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  businessId String
+  locationId String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Relations
   business    Business   @relation(fields: [businessId], references: [id])
@@ -83,28 +86,30 @@ model Employee {
   services    Service[]
   bookings    Booking[]
   favoritedBy Favorite[]
+  Queue       Queue[]
 }
 
 model Service {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
-  duration    Int       // in minutes
+  duration    Int // in minutes
   price       Float
   businessId  String
   locationId  String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  business    Business   @relation(fields: [businessId], references: [id])
-  location    Location?  @relation(fields: [locationId], references: [id])
-  employees   Employee[]
-  bookings    Booking[]
+  business  Business   @relation(fields: [businessId], references: [id])
+  location  Location?  @relation(fields: [locationId], references: [id])
+  employees Employee[]
+  bookings  Booking[]
+  Queue     Queue[]
 }
 
 model Booking {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   date          DateTime
   status        BookingStatus @default(PENDING)
   notes         String?
@@ -112,19 +117,19 @@ model Booking {
   locationId    String
   serviceId     String
   employeeId    String
-  userId        String?   // Optional for non-registered customers
-  customerName  String    // For both registered and non-registered customers
+  userId        String? // Optional for non-registered customers
+  customerName  String // For both registered and non-registered customers
   customerEmail String
   customerPhone String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   // Relations
-  business    Business     @relation(fields: [businessId], references: [id])
-  location    Location     @relation(fields: [locationId], references: [id])
-  service     Service      @relation(fields: [serviceId], references: [id])
-  employee    Employee     @relation(fields: [employeeId], references: [id])
-  user        User?        @relation(fields: [userId], references: [id])
+  business Business @relation(fields: [businessId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+  service  Service  @relation(fields: [serviceId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
+  user     User?    @relation(fields: [userId], references: [id])
 }
 
 enum BookingStatus {
@@ -136,14 +141,49 @@ enum BookingStatus {
 }
 
 model Favorite {
-  id          String    @id @default(cuid())
-  userId      String
-  employeeId  String
-  createdAt   DateTime  @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  employeeId String
+  createdAt  DateTime @default(now())
 
   // Relations
-  user        User      @relation(fields: [userId], references: [id])
-  employee    Employee  @relation(fields: [employeeId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  employee Employee @relation(fields: [employeeId], references: [id])
 
   @@unique([userId, employeeId])
+}
+
+enum QueueStatus {
+  WAITING
+  IN_SERVICE
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model Queue {
+  id              String      @id @default(cuid())
+  locationId      String
+  date            DateTime    @default(now())
+  status          QueueStatus @default(WAITING)
+  position        Int
+  estimatedTime   DateTime?
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  customerId      String?
+  customerName    String
+  customerPhone   String?
+  serviceId       String
+  employeeId      String?
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relations
+  location   Location  @relation(fields: [locationId], references: [id])
+  customer   User?     @relation(fields: [customerId], references: [id])
+  service    Service   @relation(fields: [serviceId], references: [id])
+  employee   Employee? @relation(fields: [employeeId], references: [id])
+  Business   Business? @relation(fields: [businessId], references: [id])
+  businessId String?
 }
