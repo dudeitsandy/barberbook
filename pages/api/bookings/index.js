@@ -5,7 +5,7 @@ import { BookingService } from '@/services/bookingService'
 import { QueueService } from '@/services/queueService'
 import { errorHandler } from '@/utils/errors'
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req, res) {
   try {
     switch (req.method) {
       case 'POST': {
