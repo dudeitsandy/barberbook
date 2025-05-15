@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
-import { QueueForm } from '@/components/QueueForm'
+import { QueueForm } from '../../components/QueueForm'
 import { useState } from 'react'
-import BookingForm from '@/components/BookingForm'
+import BookingForm from '../../components/BookingForm'
 
 export default function BookingPage() {
   const router = useRouter()
