@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQueue } from '@/hooks/useQueue'
+import { useQueue } from '../hooks/useQueue'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
