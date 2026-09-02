@@ -10,20 +10,25 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      setUser(session.user)
-      
-      // If user is a business owner, fetch business details
-      if (session.user.role === 'BUSINESS' && session.user.businessId) {
-        fetchBusinessDetails(session.user.businessId)
+    const initializeAuth = async () => {
+      if (status === 'authenticated' && session?.user) {
+        setUser(session.user)
+        
+        if (session.user.role === 'BUSINESS' && session.user.businessId) {
+          try {
+            await fetchBusinessDetails(session.user.businessId)
+          } catch (error) {
+            console.error('Failed to fetch business details:', error)
+          }
+        }
+      } else if (status === 'unauthenticated') {
+        setUser(null)
+        setBusiness(null)
       }
-      
-      setLoading(false)
-    } else if (status === 'unauthenticated') {
-      setUser(null)
-      setBusiness(null)
       setLoading(false)
     }
+
+    initializeAuth()
   }, [session, status])
 
   const fetchBusinessDetails = async (businessId) => {

@@ -22,19 +22,15 @@ export default NextAuth({
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
             include: {
-              businessOwned: true // Include business data
+              businessOwned: true // This is correct, but we should verify role
             }
           })
 
-          console.log('Found user:', user) // Add this log
-
-          if (!user) {
-            throw new Error('No user found')
+          if (!user || user.role !== 'BUSINESS') { // Add role check
+            throw new Error('Invalid credentials or not a business account')
           }
 
           const isValid = await bcrypt.compare(credentials.password, user.password)
-          console.log('Password valid:', isValid) // Add this log
-
           if (!isValid) {
             throw new Error('Invalid password')
           }
@@ -42,11 +38,12 @@ export default NextAuth({
           return {
             id: user.id,
             email: user.email,
+            name: user.name,
             role: user.role,
             businessId: user.businessOwned?.id
           }
         } catch (error) {
-          console.error('Auth error:', error) // Add detailed error logging
+          console.error('Auth error:', error)
           throw error
         }
       }

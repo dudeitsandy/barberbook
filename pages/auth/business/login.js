@@ -23,7 +23,7 @@ export default function BusinessLogin() {
         redirect: false,
         email: formData.email,
         password: formData.password,
-        role: 'BUSINESS' // Add role to identify business login
+        role: 'BUSINESS' // This is sent but not used in [...nextauth].js
       })
 
       if (result.error) {

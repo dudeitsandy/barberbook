@@ -17,11 +17,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations based on role
+  // Relations
   businessOwned Business? // If role is BUSINESS
-  bookings      Booking[] // If role is CUSTOMER
-  favorites     Favorite[]
-  Queue         Queue[]
+  bookings     Booking[] // If role is CUSTOMER
+  favorites    Favorite[]
+  Queue        Queue[]
 }
 
 enum Role {
